@@ -87,14 +87,7 @@ module.exports = class MyDatabase {
 	}
 
 	insertAlarm(user, alarm) {
-		this.db.run('INSERT INTO Alarms (user, parameter, value, created_at) VALUES (?,?,?,?)', [user, alarm.parameter, alarm.value, alarm.time], (err) => {
-			if (err) {
-				console.log('error inserting alarm');
-			}
-			else {
-				console.log('succesfully inserted alarm');
-			}
-		});
+		this.db.run('INSERT INTO Alarms (user, parameter, value, created_at) VALUES (?,?,?,?)', user, alarm.parameter, alarm.value, alarm.time);
 	}
 
 	/**

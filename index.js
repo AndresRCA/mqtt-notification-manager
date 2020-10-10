@@ -18,7 +18,6 @@ let localDB = new MyDatabase();
 localDB.createTables()
 	.then((res) => {
 		firebaseDB.ref('/users').on('child_added', (snapshot, prevChildKey) => {
-			console.log(snapshot.val());
 			localDB.setUpNewUserStates(snapshot.key);
 		});
 		firebaseDB.ref('/users').on('child_removed', (snapshot) => {
@@ -50,10 +49,10 @@ app.get('/api/:user/:from-:to', async (req, res) => {
 	try {
 		let reports = await localDB.getReports(user, from_date, to_date);
 		console.log("retrieved reports: " + reports);
-		res.json({ reports });
+		res.json(reports);
 	} catch(e) {
 		console.log(e);
-		res.send("ERROR");
+		res.status(400).send({ message: "error retrieving data" });
 	}
 });
 /*-----------------------------------------------------------*/
