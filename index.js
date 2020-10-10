@@ -1,18 +1,3 @@
-/*-------------------- Server Setup -------------------------*/
-let PORT = process.env.PORT || 5000;
-let express = require('express');
-let app = express();
-
-app.get('/', (req, res) => {
-	// send normal http response, since this is not a website really
-	res.send('app is running properly');
-});
-
-app.listen(PORT, () => {
-	console.log('server started on port ' + PORT);
-});
-/*-----------------------------------------------------------*/
-
 /*-------------------- DBs Setup ----------------------------*/
 // firebase setup
 const firebase = require("firebase-admin");
@@ -43,15 +28,34 @@ localDB.createTables()
 	.catch((e) => {
 		console.log(e);
 	});
+/*-----------------------------------------------------------*/
 
-// im thinking, maybe I should create the structure like this:
-// /users/{user}/{ username, password }
-// /waterSamples/{user}/{ pH, orp, turbidity, temperature, created_at }
-// /alarmParameters/{user}/{ pH_min, pH_max, orp_min, ... }
-/*firebaseDB.ref('/users').on('value', (snapshot) => {
-	if (snapshot.hasChildren()) { // i want to get the id's without downloading underlying data... it seems it can't be done
+/*-------------------- Server Setup -------------------------*/
+let PORT = process.env.PORT || 5000;
+let express = require('express');
+let app = express();
+
+app.get('/', (req, res) => {
+	// send normal http response, since this is not a website really
+	res.send('app is running properly');
+});
+
+app.get('/api/:user/:from-:to', async (req, res) => {
+	let user = req.params.user;
+	let from_date = parseInt(req.params.from);
+	let to_date = parseInt(req.params.to);
+	console.log('user: ' + user);
+	console.log('from: ' + from_date);
+	console.log('to: ' + to_date);
+	try {
+		let reports = await localDB.getReports(user, from_date, to_date);
+		console.log("retrieved reports: " + reports);
+		res.json({ reports });
+	} catch(e) {
+		console.log(e);
+		res.send("ERROR");
 	}
-});*/
+});
 /*-----------------------------------------------------------*/
 
 // alarm manager setup
@@ -108,4 +112,9 @@ mqttClient.on('message', function (topic, message) {
 
 		localDB.setParameterStates(user, result.flags); // set the current state of the parameters
 	});
+});
+
+// Start server
+app.listen(PORT, () => {
+	console.log('server started on port ' + PORT);
 });

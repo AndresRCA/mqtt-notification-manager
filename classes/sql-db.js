@@ -87,6 +87,31 @@ module.exports = class MyDatabase {
 	}
 
 	insertAlarm(user, alarm) {
-		this.db.run('INSERT INTO Alarms (user, parameter, value, created_at) VALUES (?,?,?,?)', user, alarm.parameter, alarm.value, alarm.time);
+		this.db.run('INSERT INTO Alarms (user, parameter, value, created_at) VALUES (?,?,?,?)', [user, alarm.parameter, alarm.value, alarm.time], (err) => {
+			if (err) {
+				console.log('error inserting alarm');
+			}
+			else {
+				console.log('succesfully inserted alarm');
+			}
+		});
+	}
+
+	/**
+	 * get list of alarms for the given user and times
+	 * @param  String user [description]
+	 * @param  long from_time: start time
+	 * @param  long to_time: end time
+	 * @return Promise
+	 */
+	getReports(user, from_time, to_time) {
+		return new Promise((resolve, reject) => {
+			this.db.all('SELECT * FROM Alarms WHERE user = ? AND created_at BETWEEN ? AND ? ORDER BY created_at', [user, from_time, to_time], (err, rows) => {
+				if (err) {
+					reject(err);
+				}
+				resolve(rows);
+			});
+		});
 	}
 }

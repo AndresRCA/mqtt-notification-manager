@@ -124,10 +124,10 @@ module.exports = class AlarmManager {
 				
 				firebase.messaging().sendToDevice(registrationToken, message, options)
 					.then((res) => {
-						console.log('message was delivered successfully');
+						console.log('notification was delivered successfully');
 					})
 					.catch((err) => {
-						console.log('error sending message', err);
+						console.log('error sending notification', err);
 					});
 			}
 		});
